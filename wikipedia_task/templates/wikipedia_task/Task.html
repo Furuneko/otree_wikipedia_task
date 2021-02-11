@@ -1,0 +1,74 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-3" style="padding-left: 5px; padding-right: 10px">
+                {% chat channel=channel_name %}
+            </div>
+            <div class="col-9" style="padding-left: 10px; padding-right: 10px">
+                {% with article=article %}
+                    <textarea title="" name="article_edited" style="height: 84vh;">{{ article }}</textarea>
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.tiny.cloud/1/glorf0axt78s2iaorod7p0qjtbjpyqqh7d3rp7skn1bvv2j8/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script type= "text/javascript">
+        $(function () {
+            let config = {
+                "docId": "{{ doc_id }}",
+                "username": "Participant " + "{{ player.id_in_group }}",
+                "apiKey": "5cafffa9-c01b-4cec-94ed-fdf58daeefa9"
+            };
+            tinymce.init({
+                selector: "textarea",
+                plugins: [
+                    "save advlist autolink lists link image charmap preview autosave",
+                    "searchreplace visualblocks code fullscreen tinydrive",
+                    "media table paste imagetools wordcount"
+                ],
+                removed_menuitems: 'newdocument preview',
+                toolbar: 'save undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | addcomment showcomments casechange',
+                toolbar_drawer: 'floating',
+                content_css : "{% static "wikipedia_task/css/wikipedia_article.css" %}",
+                browser_spellcheck: true,
+                autosave_interval: "30s",
+                autosave_restore_when_empty: true,
+                save_onsavecallback: function() {liveSend({'type': 'article_edited', 'content': tinymce.activeEditor.getContent()})},
+                tinycomments_mode: 'embedded',
+                tinycomments_author: "Participant " + "{{ participant.id_in_session}}",
+                external_plugins: {"wave": "https://cdn2.codox.io/waveTinymce/plugin.min.js"},
+                wave: config,
+            });
+        })
+    </script>
+{% endblock %}
+
+{% block styles %}
+    <style>
+        .otree-body {
+            max-width: 100%!important;
+        }
+        .debug-info {
+            display: none;
+        }
+        .otree-chat {
+            height: 84vh;
+            margin-top: 0!important;
+        }
+        .otree-chat__messages {
+            height: 73vh!important;
+            overflow-wrap: break-word;
+        }
+    </style>
+{% endblock %}
+
+
